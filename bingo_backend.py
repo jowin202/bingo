@@ -361,10 +361,15 @@ def list_board(bid):
 @app.route('/status/<int:gid>')
 def boards_status(gid):
     res = db.session.query(board.board_id, func.count(board.board_id)).filter(and_(drawn_number.game_id == gid, board.game_id == gid, or_(board.b1 == drawn_number.number,board.b2 == drawn_number.number,board.b3 == drawn_number.number,board.b4 == drawn_number.number,board.b5 == drawn_number.number,board.i1 == drawn_number.number,board.i2 == drawn_number.number,board.i3 == drawn_number.number,board.i4 == drawn_number.number,board.i5 == drawn_number.number,board.n1 == drawn_number.number,board.n2 == drawn_number.number,board.n3 == drawn_number.number,board.n4 == drawn_number.number,board.n5 == drawn_number.number,board.g1 == drawn_number.number,board.g2 == drawn_number.number,board.g3 == drawn_number.number,board.g4 == drawn_number.number,board.g5 == drawn_number.number,board.o1 == drawn_number.number,board.o2 == drawn_number.number,board.o3 == drawn_number.number,board.o4 == drawn_number.number,board.o5 == drawn_number.number) )).group_by(board.board_id).all()
-    print("data:")
-    print(res)
     
-    return resp(None, 200)
+    data = {}
+    
+    for r in res:
+        data[ int(r[0]) ]= r[1]
+    
+    
+    return resp(data)
+
     '''SELECT b.board_id, COUNT(*) FROM board AS b, drawn_number AS d WHERE b.game_id = d.game_id AND
 b.b1 = d.number OR
 b.b2 = d.number OR
