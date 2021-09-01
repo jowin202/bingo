@@ -5,8 +5,10 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QWidget>
+#include <QTimer>
 
 #include "protocol.h"
+#include "game.h"
 
 namespace Ui {
 class ManageGameWidget;
@@ -30,6 +32,15 @@ private slots:
     void draw_num_button_pressed();
     void on_btn_create_instance_clicked();
     void on_button_rand_instance_clicked();
+    void show_drawn_nums(QVariantList nums);
+
+
+
+    void on_btn_refresh_boards_clicked();
+
+    void on_refresh_drawn_nums_button_clicked();
+
+    void on_draw_random_button_clicked();
 
 private:
     Ui::ManageGameWidget *ui;

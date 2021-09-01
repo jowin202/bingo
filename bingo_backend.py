@@ -2,6 +2,8 @@
 
 import datetime
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.sql import func
+from sqlalchemy import or_, and_
 from flask import Flask
 from flask import current_app, flash, jsonify, make_response, redirect, request, Response, url_for
 
@@ -278,7 +280,7 @@ def draw_random_number(gid):
 
 
         
-@app.route('/game/<int:gid>/draw/<int:num>', methods=['GET'])
+@app.route('/game/<int:gid>/draw/<int:num>', methods=['PUT'])
 def draw_number(gid, num):
     res = drawn_number.query.filter_by(game_id=gid).all()
     if len(res) >= 75:
@@ -296,6 +298,17 @@ def draw_number(gid, num):
     db.session.add(new_number)
     db.session.commit()
     return resp(None, 200)
+
+
+@app.route('/game/<int:gid>/drawn/', methods=['GET'])
+def get_drawn_number(gid):
+    res = drawn_number.query.filter_by(game_id=gid).all()
+    
+    output = []
+    for val in res:
+        output.append(val.number)
+    return resp(output, 200)
+
 
 
     
@@ -320,12 +333,64 @@ def new_board():
 
 
 
-@app.route('/board/<int:bid>/')
+@app.route('/game/<int:gid>/boards/')
+def list_boards(gid):
+    result = []
+    for g in board.query.filter_by(game_id=gid).all():
+        result.append(g.toJson())
+    
+    return resp(result)
+
+@app.route('/board/<int:bid>/', methods=['GET', 'DELETE'])
 def list_board(bid):
-    res = board.query.filter_by(board_id=bid).first()
-    if res != None:
-        return resp(res.toJson())
-    return resp(None, 1)
+    if request.method == 'GET':
+        res = board.query.filter_by(board_id=bid).first()
+        if res != None:
+            return resp(res.toJson())
+        return resp(None, 1)
+    elif request.method == 'DELETE':
+        res = board.query.get(bid)
+        if res != None:
+            db.session.delete(res)
+            db.session.commit()
+            return resp(res.toJson())
+        return resp(None, 1)
+
+
+
+@app.route('/status/<int:gid>')
+def boards_status(gid):
+    res = db.session.query(board.board_id, func.count(board.board_id)).filter(and_(drawn_number.game_id == gid, board.game_id == gid, or_(board.b1 == drawn_number.number,board.b2 == drawn_number.number,board.b3 == drawn_number.number,board.b4 == drawn_number.number,board.b5 == drawn_number.number,board.i1 == drawn_number.number,board.i2 == drawn_number.number,board.i3 == drawn_number.number,board.i4 == drawn_number.number,board.i5 == drawn_number.number,board.n1 == drawn_number.number,board.n2 == drawn_number.number,board.n3 == drawn_number.number,board.n4 == drawn_number.number,board.n5 == drawn_number.number,board.g1 == drawn_number.number,board.g2 == drawn_number.number,board.g3 == drawn_number.number,board.g4 == drawn_number.number,board.g5 == drawn_number.number,board.o1 == drawn_number.number,board.o2 == drawn_number.number,board.o3 == drawn_number.number,board.o4 == drawn_number.number,board.o5 == drawn_number.number) )).group_by(board.board_id).all()
+    print("data:")
+    print(res)
+    
+    return resp(None, 200)
+    '''SELECT b.board_id, COUNT(*) FROM board AS b, drawn_number AS d WHERE b.game_id = d.game_id AND
+b.b1 = d.number OR
+b.b2 = d.number OR
+b.b3 = d.number OR
+b.b4 = d.number OR
+b.b5 = d.number OR
+b.i1 = d.number OR
+b.i2 = d.number OR
+b.i3 = d.number OR
+b.i4 = d.number OR
+b.i5 = d.number OR
+b.n1 = d.number OR
+b.n2 = d.number OR
+b.n3 = d.number OR
+b.n4 = d.number OR
+b.n5 = d.number OR
+b.g1 = d.number OR
+b.g2 = d.number OR
+b.g3 = d.number OR
+b.g4 = d.number OR
+b.g5 = d.number OR
+b.o1 = d.number OR
+b.o2 = d.number OR
+b.o3 = d.number OR
+b.o4 = d.number OR
+b.o5 = d.number GROUP BY b.board_id'''
 
 
 

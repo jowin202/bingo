@@ -7,6 +7,8 @@ ManageGameWidget::ManageGameWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    this->protocol = 0; //overwrite and always check
+
     connect(this->ui->btn_reset, SIGNAL(pressed()), this, SLOT(reset()));
     this->label_list.append(this->ui->label_b1);
     this->label_list.append(this->ui->label_b2);
@@ -155,6 +157,7 @@ ManageGameWidget::~ManageGameWidget()
 void ManageGameWidget::set_game_id(int game_id)
 {
     this->game_id = game_id;
+    this->protocol->get_game_by_id(game_id);
 }
 
 void ManageGameWidget::reset()
@@ -189,6 +192,9 @@ void ManageGameWidget::lock_game()
 void ManageGameWidget::setProtocol(Protocol *protocol)
 {
     this->protocol = protocol;
+    this->ui->board_list->setProtocol(protocol);
+    connect(this->protocol, SIGNAL(board_list_available(QJsonDocument)), this->ui->board_list, SLOT(retr_boards(QJsonDocument)));
+    connect(this->protocol, SIGNAL(drawn_nums_available(QVariantList)), this, SLOT(show_drawn_nums(QVariantList)));
 }
 
 void ManageGameWidget::num_button_pressed()
@@ -201,13 +207,17 @@ void ManageGameWidget::num_button_pressed()
         this->label_list.at(this->state)->setText(btn->text());
         this->state++;
         if (state == 5)
-            this->reset_buttons(16);
+            QTimer::singleShot(500, this, [this] () {this->reset_buttons(16);});
+            //this->reset_buttons(16);
         else if (state == 10)
-            this->reset_buttons(31);
+            QTimer::singleShot(500, this, [this] () {this->reset_buttons(31);});
+            //this->reset_buttons(31);
         else if (state == 15)
-            this->reset_buttons(46);
+            QTimer::singleShot(500, this, [this] () {this->reset_buttons(46);});
+            //this->reset_buttons(46);
         else if (state == 20)
-            this->reset_buttons(61);
+            QTimer::singleShot(500, this, [this] () {this->reset_buttons(61);});
+            //this->reset_buttons(61);
         else if (state == 25)
             this->lock_game();
 
@@ -220,7 +230,7 @@ void ManageGameWidget::draw_num_button_pressed()
     if (btn != 0)
     {
         int value = btn->text().toInt();
-
+        protocol->draw_num(this->game_id, value);
     }
 }
 
@@ -238,4 +248,32 @@ void ManageGameWidget::on_button_rand_instance_clicked()
 {
     this->protocol->create_instance(this->game_id, this->ui->input_rand_inst_name->text(),QList<int>());
     this->ui->input_rand_inst_name->setText("");
+}
+
+void ManageGameWidget::show_drawn_nums(QVariantList nums)
+{
+    this->ui->drawn_numbers_view->setPlainText("");
+
+    for (int i = 0; i < nums.length(); i++)
+    {
+        this->ui->drawn_numbers_view->setPlainText(this->ui->drawn_numbers_view->toPlainText() + QString::number(nums.at(i).toInt()) + ", ");
+    }
+}
+
+
+
+void ManageGameWidget::on_btn_refresh_boards_clicked()
+{
+    this->protocol->update_boards(this->game_id);
+}
+
+
+void ManageGameWidget::on_refresh_drawn_nums_button_clicked()
+{
+    this->protocol->get_drawn_nums(this->game_id);
+}
+
+void ManageGameWidget::on_draw_random_button_clicked()
+{
+
 }

@@ -16,21 +16,27 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    board.cpp \
     custombutton.cpp \
+    game.cpp \
     main.cpp \
     mainwindow.cpp \
     managegamewidget.cpp \
     protocol.cpp \
     qjsontablemodel.cpp \
-    qtableviewcustom.cpp
+    qtableviewboard.cpp \
+    qtableviewgame.cpp
 
 HEADERS += \
+    board.h \
     custombutton.h \
+    game.h \
     mainwindow.h \
     managegamewidget.h \
     protocol.h \
     qjsontablemodel.h \
-    qtableviewcustom.h
+    qtableviewboard.h \
+    qtableviewgame.h
 
 FORMS += \
     mainwindow.ui \

@@ -27,7 +27,6 @@ public:
 
 private slots:
     void on_pushButton_clicked();
-    void retr_game_list(QJsonDocument doc);
     void on_button_refresh_games_clicked();
 
 public slots:

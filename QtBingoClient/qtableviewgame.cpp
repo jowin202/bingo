@@ -1,11 +1,11 @@
-#include "qtableviewcustom.h"
+#include "qtableviewgame.h"
 #include "custombutton.h"
 
-QTableViewCustom::QTableViewCustom()
+QTableViewGame::QTableViewGame()
 {
     // do not use this constructor
 }
-QTableViewCustom::QTableViewCustom(QWidget *parent)
+QTableViewGame::QTableViewGame(QWidget *parent)
 {
     header.push_back( QJsonTableModel::Heading( { {"title","ID"},    {"index","game_id"} }) );
     header.push_back( QJsonTableModel::Heading( { {"title","Name"},    {"index","game_name"} }) );
@@ -23,7 +23,7 @@ QTableViewCustom::QTableViewCustom(QWidget *parent)
     connect(this, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(on_double_clicked(const QModelIndex &)));
 }
 
-void QTableViewCustom::setJson( const QJsonArray& array )
+void QTableViewGame::setJson( const QJsonArray& array )
 {
     this->model->setJson(array);
 
@@ -47,18 +47,18 @@ void QTableViewCustom::setJson( const QJsonArray& array )
     }
 }
 
-void QTableViewCustom::setProtocol(Protocol *protocol)
+void QTableViewGame::setProtocol(Protocol *protocol)
 {
     this->protocol = protocol;
     connect(model, SIGNAL(rowEdit(QList<QVariant>)), this->protocol, SLOT(change_game(QList<QVariant>)));
 }
 
-void QTableViewCustom::on_double_clicked(const QModelIndex &index)
+void QTableViewGame::on_double_clicked(const QModelIndex &index)
 {
     this->edit(index);
 }
 
-void QTableViewCustom::delete_game()
+void QTableViewGame::delete_game()
 {
     CustomButton *btn = (CustomButton*) sender();
     if (btn != 0)
@@ -68,7 +68,7 @@ void QTableViewCustom::delete_game()
     }
 }
 
-void QTableViewCustom::game_edit_pressed()
+void QTableViewGame::game_edit_pressed()
 {
     CustomButton *btn = (CustomButton*)sender();
 
@@ -76,4 +76,10 @@ void QTableViewCustom::game_edit_pressed()
     {
         emit edit_game(btn->get_id());
     }
+}
+
+void QTableViewGame::retr_game_list(QJsonDocument doc)
+{
+    this->setJson(doc.object().value("data").toArray());
+    this->resizeColumnsToContents();
 }

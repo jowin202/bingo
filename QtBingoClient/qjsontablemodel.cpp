@@ -78,6 +78,17 @@ QVariant QJsonTableModel::data( const QModelIndex &index, int role ) const
             {
                 return QString::number( v.toDouble() );
             }
+            else if (v.isArray())
+            {
+                QJsonArray a = v.toArray();
+                QString num;
+                for (int i = 0; i < a.count(); i++)
+                {
+                    num.append(QString::number(a.at(i).toInt()));
+                    num.append(" ");
+                }
+                return num;
+            }
             else
             {
                 return QVariant();
@@ -118,5 +129,5 @@ bool QJsonTableModel::setData(const QModelIndex &index, const QVariant &value, i
 
 Qt::ItemFlags QJsonTableModel::flags(const QModelIndex &index) const
 {
-    return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
+    return QAbstractItemModel::flags(index);// | Qt::ItemIsEditable;
 }

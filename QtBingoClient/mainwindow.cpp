@@ -13,8 +13,9 @@ MainWindow::MainWindow(QWidget *parent)
     this->ui->game_widget->setProtocol(this->protocol);
 
     connect(this->ui->tableView, SIGNAL(edit_game(int)), this, SLOT(edit_game(int)));
-    connect(this->protocol, SIGNAL(game_list_available(QJsonDocument)), this, SLOT(retr_game_list(QJsonDocument)));
+    connect(this->protocol, SIGNAL(game_list_available(QJsonDocument)), this->ui->tableView , SLOT(retr_game_list(QJsonDocument)));
 
+    this->protocol->update_games();
 
     this->ui->stackedWidget->setCurrentIndex(0);
 }
@@ -38,13 +39,6 @@ void MainWindow::on_pushButton_clicked()
 
 
 
-
-
-void MainWindow::retr_game_list(QJsonDocument doc)
-{
-    this->ui->tableView->setJson(doc.object().value("data").toArray());
-    this->ui->tableView->resizeColumnsToContents();
-}
 
 void MainWindow::on_button_refresh_games_clicked()
 {
